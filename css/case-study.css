@@ -237,7 +237,7 @@
 /* Border on the side facing the text */
 .cs-block--image-left .cs-block__image {
   border-right: var(--rule);
-  flex: 0 0 calc((66.666%) - 1px);
+  flex: 0 0 calc((66.666%) - 0px);
 }
 
 .cs-block--image-right .cs-block__image {
@@ -255,13 +255,13 @@
 }
 
 .cs-block__caption {
-  font-family: var(--font-mono);
-  font-size: 10px;
+  font-family: var(--font-body);
+  font-size: 12px;
   font-weight: 400;
-  letter-spacing: 0.05em;
+  letter-spacing: 0em;
   color: rgba(255, 255, 255, 0.8);
   background: var(--main-black);
-  padding: var(--space-md) var(--space-l);
+  padding: var(--space-md) var(--space-md);
 }
 
 .cs-block__image .cs-block__caption {
@@ -320,6 +320,7 @@
 
 .cs-block--text-only.cs-block--align-right .cs-block__inner {
   grid-column: 2 / 4;
+  margin-left: 1px;
 }
 
 /* ── SHARED BLOCK TYPOGRAPHY ────────────────────────────────────────── */

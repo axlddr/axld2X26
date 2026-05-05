@@ -61,8 +61,8 @@
   --dot-size:  20px;
 
   /* Layout */
-  --sidebar-width:    400px;
+  --sidebar-width:    350px;
   --acid-band-width:  64px;
-  --page-max-width:   2160px;
+  --page-max-width:   2000px;
   --content-padding:  80px;
 }

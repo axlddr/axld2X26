@@ -19,7 +19,7 @@ html, body {
   position: fixed;
   top: 0;
   left: 0;
-  width: var(--sidebar-width);
+  width: calc(var(--sidebar-width) + 1px);
   height: 100vh;
   display: flex;
   box-shadow: inset -1px 0 0 var(--border);
@@ -161,7 +161,7 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: var(--space-xxl);
-  padding: var(--space-xxxl) var(--space-xxl) 0;
+  padding: var(--space-xxl) var(--space-xl) 0;
   flex-shrink: 0;
 }
 
@@ -225,7 +225,7 @@ html, body {
   display: flex;
   flex-direction: column;
   gap: var(--space-xm);
-  padding: var(--space-xxl);
+  padding: var(--space-xl);
   flex-shrink: 0;
 }
 
@@ -282,7 +282,7 @@ html, body {
   align-items: flex-end;
   gap: var(--space-md);
   font-family: var(--font-mono);
-  font-size: 24px;
+  font-size: 16px;
   font-weight: 400;
   line-height: 0.8;
   letter-spacing: 0;
@@ -332,7 +332,7 @@ html, body {
   position: fixed;
   top: 0;
   bottom: 0;
-  left: calc(var(--sidebar-width) - 1px);
+  left: calc(var(--sidebar-width) - 0px);
   right: 0;
   max-width: calc(var(--page-max-width) + 2px);
   margin: 0 auto;
@@ -395,7 +395,7 @@ html, body {
 }
 
 .topbar__plus-pk--1 { left: -9px; }
-.topbar__plus-pk--2 { left: calc(33.333% - 10px); }
+.topbar__plus-pk--2 { left: calc(33.333% - 9px); }
 .topbar__plus-pk--3 { left: calc(66.666% - 11px); }
 .topbar__plus-pk--4 { right: -10px; }
 
@@ -470,7 +470,7 @@ html, body {
   z-index: 4;
 }
 
-.info-panel__plus-pk--bl { left: -9px; }
+.info-panel__plus-pk--bl { left: -10px; }
 .info-panel__plus-pk--br { right: -11px; }
 
 .hero__info-badge span {
@@ -536,8 +536,8 @@ html, body {
 }
 
 .stats__plus-pk--t1 { top: -11px; left: -9px; }
-.stats__plus-pk--t2 { top: -11px; left: calc(33.333% - 10px); }
-.stats__plus-pk--t3 { top: -11px; left: calc(66.666% - 10px); }
+.stats__plus-pk--t2 { top: -11px; left: calc(33.333% - 9px); }
+.stats__plus-pk--t3 { top: -11px; left: calc(66.666% - 11px); }
 .stats__plus-pk--t4 { top: -11px; right: -10px; }
 
 .skills__plus-pk {
@@ -549,8 +549,8 @@ html, body {
 }
 
 .skills__plus-pk--1 { left: -10px; }
-.skills__plus-pk--2 { left: calc(33.333% - 10px); }
-.skills__plus-pk--3 { left: calc(66.666% - 10px); }
+.skills__plus-pk--2 { left: calc(33.333% - 9px); }
+.skills__plus-pk--3 { left: calc(66.666% - 11px); }
 .skills__plus-pk--4 { right: -11px; }
 
 .hero__stat {
