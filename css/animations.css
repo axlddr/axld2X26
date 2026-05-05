@@ -1,0 +1,30 @@
+/* ── ACID BAND — SCROLL VERTICAL INFINI ─────────────────────────────── */
+
+/*
+ * Le ticker utilise writing-mode: vertical-rl + rotate(180deg) sur chaque item,
+ * ce qui fait lire le texte de bas en haut. Le conteneur (.acid-band__ticker)
+ * anime translateY de 0 → -50% pour boucler sans saut entre les deux copies.
+ */
+
+@keyframes acidScroll {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
+}
+
+/* ── BOOT SEQUENCE ───────────────────────────────────────────────────── */
+
+/*
+ * 2 rapid flashes then stable — instant transitions via adjacent keyframe pairs.
+ * 1% interval = 2ms at 200ms duration, imperceptible as a fade.
+ */
+@keyframes boot-blink {
+  0%,  18% { opacity: 0; }
+  19%, 38% { opacity: 1; }
+  39%, 57% { opacity: 0; }
+  58%, 100%{ opacity: 1; }
+}
+
+@keyframes boot-slide-left {
+  from { transform: translateX(-100%); }
+  to   { transform: translateX(0); }
+}

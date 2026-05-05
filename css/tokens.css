@@ -1,0 +1,68 @@
+/* ── FONT FACES ─────────────────────────────────────────────────────── */
+
+@font-face {
+  font-family: 'MONO-RGOMODULAR';
+  src: url('../assets/fonts/MONO-RGOMODULAR-Regular.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MONO-RGOMODULAR';
+  src: url('../assets/fonts/MONO-RGOMODULAR-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'MONO-RGOMODULAR';
+  src: url('../assets/fonts/MONO-RGOMODULAR-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+/* ── DESIGN TOKENS ──────────────────────────────────────────────────── */
+
+:root {
+
+  /* Couleurs */
+  --accent-1:        #B8FF00;
+  --accent-2:        #FF2D6B;
+  --border:          #A1A1A1;
+  --main-black:      #303030;
+  --secondary-black: #4C4C4C;
+  --tertiary-black:  #8C8A8A;
+  --white-bg:        #F3F1E8;
+  --gray-bg:         #E8E5E1;
+
+  /* Espacements */
+  --space-sm:   4px;
+  --space-md:   8px;
+  --space-xs:   12px;
+  --space-xm:   16px;
+  --space-l:    24px;
+  --space-xl:   32px;
+  --space-xxl:  48px;
+  --space-xxxl: 64px;
+
+  /* Typographie */
+  --font-display: 'MONO-RGOMODULAR', sans-serif;
+  --font-body:    'Space Grotesk', sans-serif;
+  --font-mono:    'Space Mono', monospace;
+
+  /* Bordures */
+  --rule: 1px solid var(--border);
+
+  /* Dot grid pattern */
+  --dot-color: var(--border);
+  --dot-size:  20px;
+
+  /* Layout */
+  --sidebar-width:    400px;
+  --acid-band-width:  64px;
+  --page-max-width:   2160px;
+  --content-padding:  80px;
+}

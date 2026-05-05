@@ -1,0 +1,690 @@
+/* ── BASE ───────────────────────────────────────────────────────────── */
+
+html, body {
+  height: 100%;
+  background-color: var(--white-bg);
+  color: var(--main-black);
+  font-family: var(--font-body);
+}
+
+/* ── PAGE WRAPPER ───────────────────────────────────────────────────── */
+
+.page-wrapper {
+  min-height: 100vh;
+}
+
+/* ── SIDEBAR ────────────────────────────────────────────────────────── */
+
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: var(--sidebar-width);
+  height: 100vh;
+  display: flex;
+  box-shadow: inset -1px 0 0 var(--border);
+  background: var(--white-bg);
+  overflow: hidden;
+  z-index: 100;
+  animation: boot-slide-left 500ms cubic-bezier(0.16, 1, 0.3, 1) var(--boot-delay, 0ms) both;
+}
+
+/* ── BANDE ACID ─────────────────────────────────────────────────────── */
+
+/*
+ * position: relative + z-index: 1 → la bande passe par-dessus
+ * le sidebar__header (position: absolute, z-index: 0).
+ * Pas de border-right : la séparation est visuelle (vert vs blanc).
+ */
+.acid-band {
+  position: relative;
+  z-index: 1;
+  width: var(--space-xxxl);
+  height: 100vh;
+  background-color: var(--accent-1);
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+/* Conteneur animé — paused par défaut, running au hover */
+.acid-band__ticker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  animation: acidScroll 22s linear infinite;
+  animation-play-state: paused;
+}
+
+.acid-band:hover .acid-band__ticker {
+  animation-play-state: running;
+}
+
+/*
+ * Chaque label "AXEL DADURE" :
+ * writing-mode: vertical-rl  → texte coule de haut en bas
+ * rotate(180deg)             → inverse : lecture de bas en haut
+ * line-height: 64px          → contrôle la largeur de colonne
+ *   (dans les modes verticaux, line-height = direction de bloc = horizontal)
+ */
+.acid-band__label {
+  display: block;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
+  white-space: nowrap;
+  width: var(--space-xxxl);
+  line-height: var(--space-xxxl);
+  font-family: var(--font-display);
+  font-size: 38px;
+  font-weight: 700;
+  color: var(--main-black);
+  text-transform: uppercase;
+  letter-spacing: -0.06em;
+}
+
+/* Séparateur SVG entre chaque "AXEL DADURE" */
+.acid-band__sep {
+  display: block;
+  width: 16px;
+  height: 16px;
+  margin: var(--space-xs) auto;
+}
+
+/* ── CORPS DU SIDEBAR ───────────────────────────────────────────────── */
+
+.sidebar__body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+  /* padding-top = hauteur du header absolu pour éviter le chevauchement */
+  padding-top: var(--space-xxxl);
+}
+
+/*
+ * En-tête sombre pleine largeur (512px) — position absolute derrière
+ * la bande acid (z-index: 0 < acid-band z-index: 1).
+ */
+.sidebar__header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--space-xxxl);
+  background-color: var(--main-black);
+  z-index: 0;
+}
+
+/* Rangée dots */
+.sidebar__dot-row {
+  display: flex;
+  height: var(--space-xxxl); /* 64px */
+  border-bottom: var(--rule);
+  flex-shrink: 0;
+}
+
+/* Zone gauche : remplit l'espace, contenu à venir */
+.dot-row__left {
+  flex: 1;
+  background-color: var(--gray-bg);
+}
+
+/* Zone droite : 64×64px, dots centrés, PLUS_PK en coin bas-gauche */
+.dot-row__right {
+  position: relative;
+  width: var(--space-xxxl);
+  height: var(--space-xxxl);
+  flex-shrink: 0;
+  box-shadow: inset 1px 0 0 var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dot-row__pattern {
+  width: 32px;
+  height: 32px;
+}
+
+.dot-row__plus-pk {
+  position: absolute;
+  bottom: -9px;
+  left: -9px;
+  width: 20px;
+  height: 20px;
+}
+
+/* ── NAVIGATION ─────────────────────────────────────────────────────── */
+
+.sidebar__nav {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xxl);
+  padding: var(--space-xxxl) var(--space-xxl) 0;
+  flex-shrink: 0;
+}
+
+.nav-link {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  font-family: var(--font-body);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 0.8;
+  letter-spacing: 0;
+  color: var(--main-black);
+  transition: color 0.15s ease, gap 0.25s ease;
+  animation: boot-blink 200ms linear var(--boot-delay, 0ms) both;
+}
+
+.nav-link:hover {
+  gap: var(--space-xm);
+}
+
+.nav-link:hover {
+  color: var(--accent-2);
+}
+
+/*
+ * mask-image : le SVG sert de masque, background-color remplit la forme.
+ * Permet de changer la couleur du + via CSS sans filtre approximatif.
+ */
+.nav-link__plus {
+  display: inline-block;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  margin-top: -1px;
+  background-color: var(--main-black);
+  -webkit-mask-image: url('../assets/img/PLUS_2PX.svg');
+  mask-image: url('../assets/img/PLUS_2PX.svg');
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  transition: background-color 0.15s ease, transform 0.25s ease;
+}
+
+.nav-link:hover .nav-link__plus {
+  background-color: var(--accent-2);
+  transform: rotate(90deg);
+}
+
+/* Espace flexible entre nav et footer */
+.sidebar__spacer {
+  flex: 1;
+}
+
+/* ── PIED DE PAGE DU SIDEBAR ────────────────────────────────────────── */
+
+.sidebar__footer {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xm);
+  padding: var(--space-xxl);
+  flex-shrink: 0;
+}
+
+.sidebar__social {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-xm);
+}
+
+.social-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.social-icon__img {
+  display: inline-block;
+  width: 32px;
+  height: 32px;
+  background-color: var(--tertiary-black);
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-position: center;
+  transition: background-color 0.15s ease;
+}
+
+.social-icon__img--linkedin {
+  -webkit-mask-image: url('../assets/img/LINKEDIN.svg');
+  mask-image: url('../assets/img/LINKEDIN.svg');
+}
+
+.social-icon__img--insta {
+  -webkit-mask-image: url('../assets/img/INSTA.svg');
+  mask-image: url('../assets/img/INSTA.svg');
+}
+
+.social-icon:hover .social-icon__img {
+  background-color: var(--accent-2);
+}
+
+/* Ligne séparatrice entre les deux icônes sociales */
+.social-rule {
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+  margin-bottom: 6px;
+}
+
+.sidebar__meta {
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-md);
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 0.8;
+  letter-spacing: 0;
+  color: var(--tertiary-black);
+}
+
+.meta-rule {
+  flex: 1;
+  height: 1px;
+  background-color: var(--border);
+  margin-bottom: 1px;
+}
+
+.sidebar__barcode {
+  width: 100%;
+  padding: 0 1px;
+}
+
+.barcode-img {
+  width: 100%;
+  height: auto;
+}
+
+/* ── CONTENU PRINCIPAL ──────────────────────────────────────────────── */
+
+.main-content {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  background: var(--gray-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: clip;
+}
+
+/* ── CONTENT WRAP ───────────────────────────────────────────────────── */
+
+.content-wrap {
+  width: 100%;
+  max-width: var(--page-max-width);
+  margin: 0 auto;
+}
+
+/* ── GRILLE DE FOND ─────────────────────────────────────────────────── */
+
+.content-grid {
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--sidebar-width) - 1px);
+  right: 0;
+  max-width: calc(var(--page-max-width) + 2px);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  pointer-events: none;
+  z-index: 0;
+  border-left: var(--rule);
+  border-right: var(--rule);
+}
+
+.grid-col:not(:last-child) {
+  border-right: var(--rule);
+}
+
+/* ── HERO ───────────────────────────────────────────────────────────── */
+
+.hero {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  container-type: inline-size;
+}
+
+/* Barre supérieure */
+.hero__topbar {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  height: var(--space-xxxl);
+  flex-shrink: 0;
+  z-index: 2;
+  position: relative;
+  border-bottom: var(--rule);
+  animation: boot-blink 200ms linear var(--boot-delay, 0ms) both;
+}
+
+.topbar__col {
+  position: relative;
+  display: flex;
+  align-items: center;
+  padding: 0 var(--space-l);
+}
+
+.topbar__col:last-child {
+  justify-content: flex-end;
+}
+
+.hero__serial {
+  margin-left: auto;
+}
+
+.topbar__plus-pk {
+  position: absolute;
+  bottom: -10px;
+  width: 20px;
+  height: 20px;
+  z-index: 4;
+  animation: boot-blink 200ms linear var(--boot-delay, 0ms) both;
+}
+
+.topbar__plus-pk--1 { left: -9px; }
+.topbar__plus-pk--2 { left: calc(33.333% - 10px); }
+.topbar__plus-pk--3 { left: calc(66.666% - 11px); }
+.topbar__plus-pk--4 { right: -10px; }
+
+/* Panneau info coin haut-droit */
+.hero__info-panel {
+  position: absolute;
+  top: calc(var(--space-xxxl) - 1px);
+  right: 0;
+  width: calc(100% / 3 + 1px);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  z-index: 3;
+  animation: boot-blink 200ms linear var(--boot-delay, 0ms) both;
+}
+
+.hero__info-text {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 400;
+  line-height:1;
+  letter-spacing: 0.1em;
+  color: var(--main-black);
+}
+
+.hero__info-lines {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: var(--space-md);
+  padding: var(--space-xs);
+}
+
+.hero__info-text p {
+  margin: 0;
+  white-space: nowrap;    
+  font-size: 14px;
+  letter-spacing: 1px;
+  line-height: 16px;
+}
+
+.hero__info-bar {
+  height: 8px;
+  background: linear-gradient(to right, var(--accent-2) 50%, var(--accent-1) 50%);
+}
+
+.hero__info-badge {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: var(--space-md);
+  background-color: var(--main-black);
+  padding: var(--space-xs);
+  box-shadow: inset 1px 0 0 var(--main-black);
+}
+
+.hero__info-badge img {
+  width: 100px;
+  object-fit: cover;
+}
+
+.info-panel__plus-pk {
+  position: absolute;
+  bottom: -10px;
+  width: 20px;
+  height: 20px;
+  z-index: 4;
+}
+
+.info-panel__plus-pk--bl { left: -9px; }
+.info-panel__plus-pk--br { right: -11px; }
+
+.hero__info-badge span {
+  display: block;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--white-bg);
+}
+
+/* Corps principal */
+.hero__body {
+  padding: 25vh var(--space-xxxl) 100px;
+  flex-direction: column;
+  position: relative;
+  z-index: 1;
+}
+
+.hero__caption {
+  font-family: var(--font-body);
+  font-size: 28px;
+  font-weight: 400;
+  line-height: 1;
+  color: var(--tertiary-black);
+  margin: 0 0 var(--space-xm);
+  animation: boot-blink 200ms linear var(--boot-delay, 0ms) both;
+}
+
+.hero__headline {
+  font-family: var(--font-body);
+  font-size: clamp(24px, 6.25cqw, 110px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.05em;
+  color: var(--main-black);
+  margin: 0;
+  max-width:100%;
+}
+
+.hero__headline em {
+  font-style: normal;
+  color: var(--accent-2);
+}
+
+/* Barre de stats */
+.hero__stats {
+  display: flex;
+  border-top: var(--rule);
+  border-bottom: var(--rule);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 2;
+  animation: boot-blink 200ms linear var(--boot-delay, 0ms) both;
+}
+
+.stats__plus-pk {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  z-index: 2;
+}
+
+.stats__plus-pk--t1 { top: -11px; left: -9px; }
+.stats__plus-pk--t2 { top: -11px; left: calc(33.333% - 10px); }
+.stats__plus-pk--t3 { top: -11px; left: calc(66.666% - 10px); }
+.stats__plus-pk--t4 { top: -11px; right: -10px; }
+
+.skills__plus-pk {
+  position: absolute;
+  bottom: -10px;
+  width: 20px;
+  height: 20px;
+  z-index: 2;
+}
+
+.skills__plus-pk--1 { left: -10px; }
+.skills__plus-pk--2 { left: calc(33.333% - 10px); }
+.skills__plus-pk--3 { left: calc(66.666% - 10px); }
+.skills__plus-pk--4 { right: -11px; }
+
+.hero__stat {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-md);
+  padding: var(--space-l);
+}
+
+.stat__label {
+  font-family: var(--font-mono);
+  font-size: 24px;
+  font-weight: 400;
+  line-height: 0.8;
+  letter-spacing: -5%;
+  color: var(--tertiary-black);
+  white-space: nowrap;
+}
+
+.stat__rule {
+  flex: 1;
+  height: 1px;
+  background-color: var(--border);
+}
+
+.stat__value {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 700;
+  line-height: 0.8;
+  letter-spacing: 0;
+  color: var(--main-black);
+  white-space: nowrap;
+}
+
+.hero__stat--accent {
+  color: var(--accent-2);
+}
+
+/* Ticker compétences */
+.hero__skills {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-l);
+  height: 75px;
+  background: var(--gray-bg);
+  border-bottom: var(--rule);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  animation: boot-blink 200ms linear var(--boot-delay, 0ms) both;
+}
+
+.hero__skills span {
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.skills__sep {
+  flex-shrink: 0;
+  margin: 0 8px;
+  filter: invert(1) brightness(0.549);
+}
+
+/* ── PROJECTS HEADER ────────────────────────────────────────────────── */
+
+.projects-header {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 0 40px 40px 40px;
+  background:
+      radial-gradient(circle, #3b3b3b 2px, transparent 2px) 0 0 / 48px 48px, var(--main-black);
+  position: relative;
+  z-index: 1;
+}
+
+
+.projects-header__text-wrap {
+  overflow: hidden;
+}
+
+.projects-header__text {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: -30px;
+}
+
+.projects-header__row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ph-char {
+  font-family: var(--font-display);
+  font-size: 60px;
+  font-weight: 400;
+  line-height: 1.07;
+  letter-spacing: 0.1em;
+  color: var(--white-bg);
+}
+
+.ph-cross {
+  width: 20px;
+  height: 20px;
+  filter: brightness(0) invert(1);
+  flex-shrink: 0;
+}
+
+.projects-header__assets {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: var(--space-xm);
+  flex-shrink: 0;
+}
+
+.projects-header__assets img {
+  width: 280px;
+  height: auto;
+  display: block;
+}
+
+/* ── HEADLINE WORD REVEAL ───────────────────────────────────────────── */
+
+.hero__word {
+  opacity: 0;
+}
+
+.hero__word--visible {
+  opacity: 1;
+}

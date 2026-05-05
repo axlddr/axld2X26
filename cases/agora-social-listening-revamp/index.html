@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Case Study — Axel Dadure</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300..700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="../../css/reset.css">
+  <link rel="stylesheet" href="../../css/tokens.css">
+  <link rel="stylesheet" href="../../css/components.css">
+  <link rel="stylesheet" href="../../css/animations.css">
+  <link rel="stylesheet" href="../../css/layout.css">
+  <link rel="stylesheet" href="../../css/case-study.css">
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+</head>
+<body>
+
+  <div class="page-wrapper">
+
+    <!-- ═══════════════════════════════════════ SIDEBAR -->
+    <div id="sidebar-mount"></div>
+
+    <!-- ═══════════════════════════════════════ CASE STUDY -->
+    <main class="cs-main">
+      <div class="content-grid content-grid--cs" aria-hidden="true">
+        <div class="grid-col"></div>
+        <div class="grid-col"></div>
+        <div class="grid-col"></div>
+      </div>
+
+      <div class="content-wrap">
+        <!-- ── TOPBAR ── -->
+        <div class="cs-topbar">
+          <div class="hero__topbar">
+            <div class="topbar__col">
+              <span class="hero__time serial">CURRENT TIME: <span id="hero-clock">--:--:--</span></span>
+            </div>
+            <div class="topbar__col"></div>
+            <div class="topbar__col">
+              <span class="hero__serial serial">SERIAL NO/001</span>
+            </div>
+            <img src="../../assets/img/PLUS_PK.svg" alt="" class="topbar__plus-pk topbar__plus-pk--2">
+            <img src="../../assets/img/PLUS_PK.svg" alt="" class="topbar__plus-pk topbar__plus-pk--3">
+          </div>
+        </div>
+
+        <div id="cs-root">
+          <div class="cs-loading">Chargement…</div>
+        </div>
+      </div>
+    </main>
+
+  </div>
+
+  <script>
+  // ── PARSER ───────────────────────────────────────────────────────────────
+  (function () {
+
+    // Matches :::block-name\n...content...\n::: (multiline, non-greedy)
+    var BLOCK_RE = /^:::([\w-]+)[^\n]*\n([\s\S]*?)^:::/gm;
+
+    /* ── front matter ── */
+    function extractFrontMatter(raw) {
+      var match = raw.match(/^---\n([\s\S]*?)\n---\n?/);
+      if (!match) return { meta: {}, body: raw };
+      var meta = {};
+      match[1].split('\n').forEach(function (line) {
+        var idx = line.indexOf(':');
+        if (idx === -1) return;
+        meta[line.slice(0, idx).trim()] = line.slice(idx + 1).trim();
+      });
+      return { meta: meta, body: raw.slice(match[0].length) };
+    }
+
+    /* ── key: value props (with YAML | block scalar support) ── */
+    function parseProps(content) {
+      var props = {};
+      var lines = content.split('\n');
+      var i = 0;
+      while (i < lines.length) {
+        var line = lines[i];
+        var idx = line.indexOf(':');
+        if (idx === -1) { i++; continue; }
+        var key = line.slice(0, idx).trim();
+        var val = line.slice(idx + 1).trim();
+        if (!key) { i++; continue; }
+        if (val === '|') {
+          /* collect indented block lines */
+          var blockLines = [];
+          i++;
+          while (i < lines.length) {
+            var next = lines[i];
+            if (next.trim() !== '' && !/^\s/.test(next)) break;
+            blockLines.push(next.replace(/^  /, ''));
+            i++;
+          }
+          while (blockLines.length && blockLines[blockLines.length - 1].trim() === '') blockLines.pop();
+          props[key] = blockLines.join('\n').replace(/\\n\\n/g, '<br>').replace(/\\n/g, '\n');
+        } else {
+          props[key] = val.replace(/\\n\\n/g, '<br>').replace(/\\n/g, '\n');
+          i++;
+        }
+      }
+      return props;
+    }
+
+    /* ── YAML-list items for metrics ── */
+    function parseMetricsItems(content) {
+      var items = [];
+      var current = null;
+      content.split('\n').forEach(function (line) {
+        var trimmed = line.trim();
+        if (!trimmed) return;
+        if (trimmed.startsWith('- ')) {
+          if (current) items.push(current);
+          current = {};
+          var rest = trimmed.slice(2);
+          var idx = rest.indexOf(':');
+          if (idx !== -1) current[rest.slice(0, idx).trim()] = rest.slice(idx + 1).trim();
+        } else if (current) {
+          var idx = trimmed.indexOf(':');
+          if (idx !== -1) current[trimmed.slice(0, idx).trim()] = trimmed.slice(idx + 1).trim();
+        }
+      });
+      if (current) items.push(current);
+      return items;
+    }
+
+    /* ── tokenizer ── */
+    function tokenize(body) {
+      var tokens = [];
+      var lastIndex = 0;
+      var match;
+      BLOCK_RE.lastIndex = 0;
+
+      while ((match = BLOCK_RE.exec(body)) !== null) {
+        if (match.index > lastIndex) {
+          var md = body.slice(lastIndex, match.index).trim();
+          if (md) tokens.push({ type: 'markdown', content: md });
+        }
+        var name = match[1];
+        var content = match[2];
+        if (name === 'metrics') {
+          tokens.push({ type: 'block', name: name, items: parseMetricsItems(content) });
+        } else {
+          tokens.push({ type: 'block', name: name, props: parseProps(content) });
+        }
+        lastIndex = match.index + match[0].length;
+      }
+
+      var rest = body.slice(lastIndex).trim();
+      if (rest) tokens.push({ type: 'markdown', content: rest });
+      return tokens;
+    }
+
+    /* ── helpers ── */
+    function esc(str) {
+      return (str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    }
+    function opt(condition, html) { return condition ? html : ''; }
+
+    /* ── renderers ── */
+
+    function renderHeader(props, meta) {
+      var serial = props.serial || meta.serial || '0001';
+      var keywords = (props.keywords || '').split('+').map(function (k) { return k.trim(); });
+      var kHtml = keywords.map(function (k, i) {
+        return (i > 0 ? '<img src="../../assets/img/PLUS_BLACK.svg" width="14" height="14" alt="" class="cs-header__sep">' : '') + '<span>' + esc(k) + '</span>';
+      }).join('');
+
+      return '<section class="cs-header">' +
+        '<div class="cs-header__image">' +
+          '<img src="' + esc(props.image) + '" alt="' + esc(props.title) + '">' +
+        '</div>' +
+        '<div class="cs-header__ticker">' +
+          kHtml +
+          '<img src="../../assets/img/CASE_DAMIER1.svg" alt="" class="cs-header__damier">' +
+        '</div>' +
+        '<div class="cs-header__info">' +
+          '<div class="cs-header__info-body">' +
+            '<span class="cs-header__serial serial">CASE_NO/' + esc(serial) + '</span>' +
+            '<h1 class="cs-header__title">' + esc(props.title) + '</h1>' +
+          '</div>' +
+        '</div>' +
+        '<div class="cs-header__meta">' +
+          '<div class="cs-header__meta-item">' +
+            '<span class="cs-header__meta-label">//year</span>' +
+            '<div class="cs-header__meta-rule"></div>' +
+            '<span class="cs-header__meta-value">' + esc(props.year) + '</span>' +
+          '</div>' +
+          '<div class="cs-header__meta-item">' +
+            '<span class="cs-header__meta-label">//company</span>' +
+            '<div class="cs-header__meta-rule"></div>' +
+            '<span class="cs-header__meta-value">' + esc(props.company) + '</span>' +
+          '</div>' +
+          '<div class="cs-header__meta-item">' +
+            '<span class="cs-header__meta-label">//role</span>' +
+            '<div class="cs-header__meta-rule"></div>' +
+            '<span class="cs-header__meta-value">' + esc(props.role) + '</span>' +
+          '</div>' +
+        '</div>' +
+      '</section>';
+    }
+
+    function renderSeparator(props) {
+      return '<div class="cs-separator">' +
+        '<span class="cs-separator__index">' + esc(props.index) + '</span>' +
+        '<div class="cs-separator__rule"></div>' +
+        '<span class="cs-separator__label">' + esc(props.label) + '</span>' +
+      '</div>';
+    }
+
+    function renderImageSide(props, imageLeft) {
+      var mod = imageLeft ? 'image-left' : 'image-right';
+      var imageHtml = '<div class="cs-block__image">' +
+        '<a class="glightbox" href="' + esc(props.image) + '" data-description="' + esc(props.caption || '') + '">' +
+          '<img src="' + esc(props.image) + '" alt="' + esc(props.caption || '') + '">' +
+        '</a>' +
+        opt(props.caption, '<p class="cs-block__caption">' + esc(props.caption) + '</p>') +
+      '</div>';
+      var textHtml = '<div class="cs-block__text">' +
+        opt(props.title, '<h2 class="cs-block__title">' + esc(props.title) + '</h2>') +
+        opt(props.text, '<div class="cs-block__prose">' + marked.parse(props.text) + '</div>') +
+      '</div>';
+
+      return '<section class="cs-block cs-block--' + mod + '">' +
+        imageHtml + textHtml +
+      '</section>';
+    }
+
+    function renderImageFull(props) {
+      return '<section class="cs-block cs-block--image-full">' +
+        '<a class="glightbox" href="' + esc(props.image) + '" data-description="' + esc(props.caption || '') + '">' +
+          '<img src="' + esc(props.image) + '" alt="' + esc(props.caption || '') + '">' +
+        '</a>' +
+        opt(props.caption, '<p class="cs-block__caption">' + esc(props.caption) + '</p>') +
+      '</section>';
+    }
+
+    function renderTextOnly(props) {
+      var align = props.align === 'right' ? 'right' : 'left';
+      return '<section class="cs-block cs-block--text-only cs-block--align-' + align + '">' +
+        '<div class="cs-block__inner">' +
+          opt(props.title, '<h2 class="cs-block__title">' + esc(props.title) + '</h2>') +
+          opt(props.text, '<div class="cs-block__prose">' + marked.parse(props.text) + '</div>') +
+        '</div>' +
+      '</section>';
+    }
+
+    function renderMetrics(items) {
+      var cols = items.map(function (item) {
+        return '<div class="cs-metrics__col">' +
+          '<div class="cs-metrics__header">' +
+            '<span class="cs-metrics__main-label">MAIN METRIC</span>' +
+            '<div class="cs-metrics__rule"></div>' +
+            '<span class="cs-metrics__index">' + esc(item.index) + '</span>' +
+          '</div>' +
+          '<p class="cs-metrics__label">' + esc(item.label) + '</p>' +
+          '<p class="cs-metrics__value">' + esc(item.value) + '</p>' +
+        '</div>';
+      }).join('');
+      return '<section class="cs-metrics">' + cols + '</section>';
+    }
+
+    function renderMargin() {
+      return '<div class="cs-margin"></div>';
+    }
+
+    function renderBlock(token, meta) {
+      switch (token.name) {
+        case 'header':      return renderHeader(token.props, meta);
+        case 'separator':   return renderSeparator(token.props);
+        case 'image-left':  return renderImageSide(token.props, true);
+        case 'image-right': return renderImageSide(token.props, false);
+        case 'image-full':  return renderImageFull(token.props);
+        case 'text-only':   return renderTextOnly(token.props);
+        case 'metrics':     return renderMetrics(token.items);
+        case 'margin':      return renderMargin();
+        default:            return '<!-- unknown block: ' + esc(token.name) + ' -->';
+      }
+    }
+
+    function render(tokens, meta) {
+      return tokens.map(function (token) {
+        if (token.type === 'markdown') {
+          return '<div class="cs-prose">' + marked.parse(token.content) + '</div>';
+        }
+        return renderBlock(token, meta);
+      }).join('\n');
+    }
+
+    /* ── init ── */
+    fetch('./content.md')
+      .then(function (r) {
+        if (!r.ok) throw new Error('HTTP ' + r.status);
+        return r.text();
+      })
+      .then(function (raw) {
+        var extracted = extractFrontMatter(raw);
+        var meta = extracted.meta;
+        var tokens = tokenize(extracted.body);
+        var html = render(tokens, meta);
+        if (meta.title) document.title = meta.title + ' — Axel Dadure';
+        document.getElementById('cs-root').innerHTML = html;
+        GLightbox({ selector: '.glightbox', touchNavigation: true, loop: false });
+      })
+      .catch(function (err) {
+        document.getElementById('cs-root').innerHTML =
+          '<p class="cs-error">Erreur de chargement : ' + err.message + '</p>';
+      });
+
+  })();
+  </script>
+  <script src="../../sidebar.js"></script>
+
+  <script>
+  (function () {
+    const el = document.getElementById('hero-clock');
+    function tick() {
+      const now = new Date();
+      const p = n => String(n).padStart(2, '0');
+      el.textContent = `${p(now.getHours())}:${p(now.getMinutes())}:${p(now.getSeconds())}`;
+    }
+    tick();
+    setInterval(tick, 1000);
+  })();
+  </script>
+
+</body>
+</html>

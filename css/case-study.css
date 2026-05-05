@@ -1,0 +1,502 @@
+/* ── CASE STUDY SHELL ───────────────────────────────────────────────── */
+
+.cs-main {
+  margin-left: var(--sidebar-width);
+  min-height: 100vh;
+  background: var(--gray-bg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  overflow-x: clip;
+}
+
+/* Ensure all content renders above the fixed grid (z-index: 0) */
+#cs-root {
+  position: relative;
+  z-index: 1;
+}
+
+/* Topbar wrapper — gives plus icons a positioning parent, same as .hero */
+.cs-topbar {
+  position: relative;
+  z-index: 2;
+}
+
+
+.cs-loading {
+  padding: var(--space-xxl);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--tertiary-black);
+}
+
+.cs-error {
+  padding: var(--space-xxl);
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--accent-2);
+}
+
+/* ── HEADER ─────────────────────────────────────────────────────────── */
+
+.cs-header {
+  display: flex;
+  flex-direction: column;
+}
+
+.cs-header__image {
+  background: var(--white-bg);
+  height: 40vw;
+  overflow: hidden;
+}
+
+.cs-header__image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  display: block;
+}
+
+.cs-header__info {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: var(--space-xxxl);
+  height: 300px;
+  background:
+      radial-gradient(circle, #3b3b3b 2px, transparent 2px) 0 0 / 48px 48px, var(--main-black);
+}
+
+.cs-header__info-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xm);
+}
+
+.cs-header__serial {
+  color: var(--white-bg);
+  font-size: 20px;
+  opacity: 0.6;
+}
+
+.cs-header__title {
+  font-family: var(--font-body);
+  font-size: 32px;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: 0;
+  color: var(--white-bg);
+  max-width: 70%;
+}
+
+/* Meta bar — mirrors .hero__stats */
+
+.cs-header__meta {
+  display: flex;
+  flex-shrink: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.cs-header__meta-item {
+  flex: 1;
+  display: flex;
+  align-items: flex-end;
+  gap: var(--space-md);
+  padding: var(--space-l);
+}
+
+.cs-header__meta-label {
+  font-family: var(--font-mono);
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 0.8;
+  color: var(--secondary-black);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cs-header__meta-rule {
+  flex: 1;
+  height: 1px;
+  background-color: var(--border);
+}
+
+.cs-header__meta-value {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 400;
+    line-height: 0.8;
+    letter-spacing: -1px;
+    color: var(--main-black);
+    white-space: nowrap;
+}
+
+/* Ticker — accent-1 */
+
+.cs-header__ticker {
+  height: 48px;
+  background: var(--accent-1);
+  display: flex;
+  align-items: center;
+  gap: var(--space-xm);
+  padding: 0 var(--space-xm);
+}
+
+.cs-header__ticker span {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  color: var(--main-black);
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+
+.cs-header__damier {
+  margin-left: auto;
+  height: 28px;
+  width: auto;
+  flex-shrink: 0;
+}
+
+/* ── SEPARATOR ──────────────────────────────────────────────────────── */
+
+.cs-separator {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    height: 200px;
+    padding: var(--space-xxxl);
+    background: radial-gradient(circle, #3b3b3b 2px, transparent 2px) 0 0 / 48px 48px, var(--main-black);
+}
+
+.cs-separator__index {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  color: var(--secondary-black);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cs-separator__rule {
+  flex: 1;
+  height: 1px;
+  background: var(--secondary-black);
+}
+
+.cs-separator__label {
+  font-family: var(--font-mono);
+  font-size: 30px;
+  letter-spacing: 1px;
+  font-weight: 400;
+  color: var(--white-bg);
+  text-transform: uppercase;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+/* ── IMAGE BLOCKS ───────────────────────────────────────────────────── */
+
+.cs-block {
+  display: flex;
+  border-bottom: var(--rule);
+}
+
+/* image-left : image | text — image always first in DOM */
+.cs-block--image-left {
+  flex-direction: row;
+}
+
+/* image-right : text | image — row-reverse moves image to the right */
+.cs-block--image-right {
+  flex-direction: row-reverse;
+}
+
+.cs-block__image {
+  background: var(--gray-bg);
+  overflow: hidden;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xxl);
+}
+
+.cs-block__image img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+/* Border on the side facing the text */
+.cs-block--image-left .cs-block__image {
+  border-right: var(--rule);
+  flex: 0 0 calc((66.666%) - 1px);
+}
+
+.cs-block--image-right .cs-block__image {
+  border-left: var(--rule);
+  flex: 0 0 calc(66.666% + 1px);
+}
+
+.cs-block__text {
+  flex: 0 0 33.333%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: var(--space-xm);
+  padding: var(--space-xxxl);
+}
+
+.cs-block__caption {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  color: rgba(255, 255, 255, 0.8);
+  background: var(--main-black);
+  padding: var(--space-md) var(--space-l);
+}
+
+.cs-block__image .cs-block__caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+/* image-full */
+.cs-block--image-full {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-xxl);
+  min-height: 0;
+  background: var(--gray-bg);
+  position: relative;
+}
+
+.cs-block--image-full img {
+  width: 100%;
+  max-width: 1200px;
+  height: auto;
+  display: block;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+}
+
+.cs-block--image-full .cs-block__caption {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+/* ── TEXT ONLY ──────────────────────────────────────────────────────── */
+
+.cs-block--text-only {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  min-height: 0;
+}
+
+.cs-block__inner {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xm);
+  background: var(--gray-bg);
+  padding: var(--space-xxxl);
+}
+
+.cs-block--text-only.cs-block--align-left .cs-block__inner {
+  grid-column: 1 / 3;
+  margin-right: 2px;
+}
+
+.cs-block--text-only.cs-block--align-right .cs-block__inner {
+  grid-column: 2 / 4;
+}
+
+/* ── SHARED BLOCK TYPOGRAPHY ────────────────────────────────────────── */
+
+.cs-block__title {
+  font-family: var(--font-body);
+  font-size: 24px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: 0;
+  color: var(--main-black);
+  margin: 0;
+}
+
+.cs-block__body {
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: 0;
+  color: var(--secondary-black);
+  margin: 0;
+}
+
+/* Rich text output from marked.parse — handles bullets, bold, paragraphs */
+.cs-block__prose {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.cs-block__prose p,
+.cs-block__prose li {
+  font-family: var(--font-body);
+  font-size: 18px;
+  font-weight: 400;
+  line-height: 1.25;
+  color: var(--secondary-black);
+  margin: 0;
+}
+
+.cs-block__prose ul {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding-left: var(--space-xm);
+  list-style: disc;
+}
+
+.cs-block__prose strong {
+  font-weight: 700;
+  color: var(--main-black);
+}
+
+/* ── METRICS ────────────────────────────────────────────────────────── */
+
+.cs-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  background: var(--accent-2);
+}
+
+.cs-metrics__col {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  padding: var(--space-xm) var(--space-l) var(--space-l);
+}
+
+.cs-metrics__col:not(:last-child) {
+  box-shadow: inset -1px 0 0 rgba(0, 0, 0, 0.15);
+}
+
+.cs-metrics__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.cs-metrics__main-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: var(--main-black);
+  text-transform: uppercase;
+  opacity: 0.6;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.cs-metrics__rule {
+  flex: 1;
+  height: 1px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.cs-metrics__index {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0.1em;
+  color: var(--main-black);
+  opacity: 0.6;
+  flex-shrink: 0;
+}
+
+.cs-metrics__label {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--main-black);
+  opacity: 0.75;
+  margin: 0;
+}
+
+.cs-metrics__value {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 2vw, 32px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  color: var(--main-black);
+  margin: 0;
+}
+
+/* ── MARGIN ─────────────────────────────────────────────────────────── */
+
+.cs-margin {
+  height: 80px;
+  width: 100%;
+  border-bottom: var(--rule);
+}
+
+/* ── PROSE (standard markdown) ──────────────────────────────────────── */
+
+.cs-prose {
+  padding: var(--space-xxl);
+  max-width: 720px;
+}
+
+.cs-prose h2 {
+  font-family: var(--font-body);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  color: var(--main-black);
+  margin: 0 0 var(--space-xm);
+}
+
+.cs-prose h3 {
+  font-family: var(--font-body);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--main-black);
+  margin: 0 0 var(--space-md);
+}
+
+.cs-prose p {
+  font-family: var(--font-body);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--secondary-black);
+  margin: 0 0 var(--space-xm);
+}
+
+.cs-prose p:last-child {
+  margin-bottom: 0;
+}
+
+.cs-prose strong {
+  font-weight: 700;
+  color: var(--main-black);
+}
+
+.cs-prose em {
+  font-style: italic;
+}
